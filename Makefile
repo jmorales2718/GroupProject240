@@ -1,13 +1,33 @@
-CC = g++
-LD = $(CC)
+# File: Makefile
 
-driver: driver.cpp Signal.h DTW.h DTW_GUI.h
+CXX = g++
+LD = $(CXX)
+RM = /bin/rm -f
 
-Signal.o: Signal.h Signal.cpp
+FLAGS = -g -Wall -DDEBUG
+CXXFLAGS = $(FLAGS) -c
+LDFLAGS = $(FLAGS) -o $@
 
-DTW.o: DTW.h DTW.cpp Signal.h 
+OBJS = driver.o Signal.o DTW.o DTW_GUI.o
+EXECS = proj3
 
-DTW_GUI.o: DTW_GUI.h DTW_GUI.cpp Signal.h
+all: $(EXECS)
+
+proj3: $(OBJS) 
+	$(LD) $(LDFLAGS) $^ 
+
+driver.o: Signal.h DTW.h DTW_GUI.h
+	$(CXX) $(CXXFLAGS) driver.cpp
+
+Signal.o: Signal.h
+	$(CXX) $(CXXFLAGS) Signal.cpp
+
+DTW.o: DTW.h Signal.h
+	$(CXX) $(CXXFLAGS) DTW.cpp
+
+DTW_GUI.o: DTW_GUI.h Signal.h
+	$(CXX) $(CXXFLAGS) DTW_GUI.cpp
 
 clean:
-	rm -rf *.o driver
+	$(RM) $(OBJS) $(EXECS)
+
