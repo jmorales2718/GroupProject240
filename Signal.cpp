@@ -15,7 +15,6 @@ Signal::Signal(char* file)
   getRows(file);
   findExtrema();
   normalizeData();
-  //concatenateColumns();
   populateVec();
 }
 
@@ -38,58 +37,42 @@ void Signal::concatenateColumns()
 
 string Signal::getDataValue(int index, int lineNumber)
 {
-  string line = myLines[lineNumber];
-  //cout << "line: " << line << endl;
-  //cout << endl;
-  int i = 0;
-  int start = 0;
-  int end = 0;
-  while(isWhiteSpace(line[start]))
+  istringstream iss(myLines[lineNumber]);
+  string finalStr;
+  if(index == 0)
   {
-//    cout << "infLoop MOTHERFUCKA" << endl;
-    start ++;
+    iss >> finalStr;
   }
-  //cout << "start: " << start << endl;
-  while(i < index)
+  else
   {
-    while(!isWhiteSpace(line[start])) 
+    for(int i = 0; i < index; i++)
     {
-  //    cout << "infLoop BITCH" << endl;
-      start++; 
-    } 
-   // cout << "start: " << start << endl;
-    while(isWhiteSpace(line[start]))
-    {
-   //   cout << "infLoop CUNT" << endl;
-      start++;
+      iss >> finalStr;
     }
-    i++;
-    //cout << "start: " << start << endl;
   }
-  end = start;
-  while(!isWhiteSpace(line[end]))
-  {    
-   // cout << "infLoop BITCH NIGGA" << endl;
-    end++;
-  } 
-  string dataValue = line.substr(start, end-start);
-  //cout << "doubleDV: " << doubleDV << endl;
-  return dataValue;
+  //cout << "finalStr: " << finalStr << endl;
+  return finalStr;
 }
 
 void Signal::normalizeData()
 {
-  for(unsigned int j = 0; j < myLines.size()-1; j++)
+  for(unsigned int j = 0; j < myLines.size(); j++)
   {
     string normalized;
     for(int i = 0; i < numCols; i++)
     {
+      //cout << "row: " << i << "col: " << j << endl;
+
       string dubDV  = getDataValue(i, j);
       double currDV = atof(dubDV.c_str());
+      //cout << "currDV: " << currDV << endl;
       double min    = myColExtrema[i].min;
+      //cout << "min: " << min <<endl;
       double max    = myColExtrema[i].max;
-
+      //cout << "max: " << min <<endl;
       double normDV = (currDV - min) / (max - min);
+      //cout << "normDV: " << normDV <<endl;
+      //cout << endl;
       ostringstream ss;
       string normalizedDV;
       if(normDV == 0 || normDV == 1)
@@ -101,6 +84,7 @@ void Signal::normalizeData()
       {
         ss << normDV << " ";
         normalizedDV = ss.str(); 
+        //cout << "normalizedDV: " << normalizedDV << endl;
       }
       normalized.append(normalizedDV); 
     }
@@ -117,10 +101,12 @@ void Signal::findExtrema()
   {
     double max = -DBL_MAX;
     double min = DBL_MAX;
-    for(unsigned int i = 0; i < myLines.size()-1; i++)
+    for(unsigned int i = 0; i < myLines.size(); i++)
     {
       //cout << "i: " << i << " j: " << j << endl;
+      //cout << "dvString: " << getDataValue(j,i) <<endl;
       double dataValue = atof(getDataValue(j,i).c_str());
+      //cout << "dataValue at row " << i << "and col " << j << ": " << dataValue <<endl; 
       if(dataValue < min)
       {
         min = dataValue;
@@ -166,9 +152,11 @@ void Signal::populateVec()
   
   for(int j = 0; j < numCols; j++)
   {
-    for(unsigned int i = 0; i < myLines.size()-1; i++)
+    for(unsigned int i = 0; i < myLines.size(); i++)
     {
+     // cout << "i: " << i << " j: " << j << endl;
       double myNormData = atof(getDataValue(j,i).c_str());
+     // cout << "myNormData: " << myNormData << endl;
       mySignalVector.push_back(myNormData);
     }
   }
